@@ -1,0 +1,23 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Set up window
+WIDTH, HEIGHT = 400, 400
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Pygame Test")
+
+# Main loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    
+    window.fill((0, 128, 0))  # green background
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()
