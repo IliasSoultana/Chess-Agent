@@ -1,4 +1,4 @@
-# chess_gui.py
+# chess_gui_stockfish.py
 import pygame
 import chess
 import torch
@@ -19,7 +19,7 @@ HIGHLIGHT = (186, 202, 68)
 # Paths
 # ---------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-WEIGHTS_PATH = os.path.join(BASE_DIR, "weights", "dqn_trained.pt")
+WEIGHTS_PATH = os.path.join(BASE_DIR, "weights", "dqn_trained_stockfish.pt")
 IMAGES_PATH = os.path.join(BASE_DIR, "images")
 
 # ---------------------------
@@ -62,16 +62,13 @@ def draw_pieces(win, board):
 def main():
     pygame.init()
     win = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Play DQN Chess")
+    pygame.display.set_caption("DQN Chess (Stockfish-guided)")
     clock = pygame.time.Clock()
 
     board = chess.Board()
     selected_square = None
-    player_color = chess.WHITE
-
-    # Load trained DQN
-    print("Weights file exists:", os.path.exists(WEIGHTS_PATH))
-    dqn = load_dqn(WEIGHTS_PATH)
+    player_color = chess.WHITE  # human plays white
+    dqn = load_dqn(WEIGHTS_PATH)  # load Stockfish-guided DQN
 
     run = True
     while run:
@@ -83,6 +80,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
             elif event.type == pygame.MOUSEBUTTONDOWN and board.turn == player_color:
                 x, y = pygame.mouse.get_pos()
                 col, row = x // SQUARE_SIZE, y // SQUARE_SIZE
@@ -104,7 +102,7 @@ def main():
                         board.push(move)
                     selected_square = None
 
-        # Engine move
+        # DQN engine move
         if board.turn != player_color and not board.is_game_over():
             legal_moves = list(board.legal_moves)
             state_tensor = torch.FloatTensor(encode_board(board)).unsqueeze(0)
